@@ -5,6 +5,11 @@ struct Instruction
   condition::Function
 end
 
+conditions = Dict{String, Function}(
+  "==" => ==, ">" => >, "<" => <,
+  ">=" => >=, "<=" => <=, "!=" => !=
+)
+
 function instruction_from_source(source::String)
   # Split at spaces
   words = split(source, ' ')
@@ -18,13 +23,7 @@ function instruction_from_source(source::String)
   # Condition
   condition_register = words[5]
   condition_value = parse(Int, words[7])
-
-  words[6] == "==" && (condition = (x) -> x == condition_value)
-  words[6] == ">" && (condition = (x) -> x > condition_value)
-  words[6] == "<" && (condition = (x) -> x < condition_value)
-  words[6] == ">=" && (condition = (x) -> x >= condition_value)
-  words[6] == "<=" && (condition = (x) -> x <= condition_value)
-  words[6] == "!=" && (condition = (x) -> x != condition_value)
+  condition = (x) -> conditions[words[6]](x, condition_value)
 
   return Instruction(register, operation, condition_register, condition)
 end
